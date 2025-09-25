@@ -7,6 +7,7 @@ obj/
 # User uploads / videos
 WebApp/wwwroot/video/
 WebApp/wwwroot/uploads/
+WebApp/wwwroot/tmp_chunks/
 
 # VS Code
 .vscode/
