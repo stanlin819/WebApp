@@ -1,0 +1,110 @@
+@model WebApp.Models.UserModel.User
+@{
+    ViewBag.Title = "User Details";
+    var transactions = ViewBag.Transactions as List<WebApp.Models.TransactionModel.TransactionViewModel>;    
+    var currentPage = Convert.ToInt32(ViewData["CurrentPage"] ?? 1);
+    var message = TempData["Message"];
+
+    var videoId = ViewBag.VideoId;
+    var isSuccess = TempData["isSuccess"] !=null && (bool) TempData["isSuccess"];
+    string alertClass = isSuccess ? "alert-success" : "alert-warning";
+    var comeFrom = ViewBag.comeFrom;
+    var files = ViewBag.Files as List<String>;
+}
+
+@if (message != null)
+{
+    <div class="alert @alertClass alert-dismissible fade show" role="alert">
+        @message
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="mb-4">@ViewBag.Title</h1>
+            
+            @Html.Partial("_UserCard", Model)
+
+            <div class="mb-3 d-flex justify-content-between align-items-center">
+                <div>
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                        <i class="bi bi-pencil"></i> Edit User
+                    </a>
+                    <a asp-controller=@comeFrom asp-action="Index" asp-route-page="@currentPage" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to List
+                    </a>
+                </div>
+                
+                <div class="btn-group">
+                    <a asp-controller="ImportExport" asp-action="SendUserReport" asp-route-id="@Model.Id" class="btn btn-success">
+                        <i class="bi bi-mailbox"></i> Send Report
+                    </a>
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        Export Report
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" asp-controller="ImportExport" asp-action="UserReport" asp-route-id="@Model.Id">Default</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" asp-controller="ImportExport" asp-action="UserReportFromTemplate" asp-route-id="@Model.Id">From Template</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" asp-controller="ImportExport" asp-action="UserReportPdf" asp-route-id="@Model.Id">Default - PDF</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" asp-controller="ImportExport" asp-action="UserReportFromTemplatPdf" asp-route-id="@Model.Id">From Template - PDF</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" asp-controller="ImportExport" asp-action="UserReportPdf" asp-route-id="@Model.Id" asp-route-watermark="@true">Default - PDF (Paid)</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" asp-controller="ImportExport" asp-action="UserReportFromTemplatPdf" asp-route-id="@Model.Id" asp-route-watermark="@true">From Template - PDF (Paid)</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <hr>
+
+            <h3 class="mb-3">Transaction History</h3>
+            @{
+                ViewData["ShowExportButton"] = true;
+                ViewBag.UserId = @Model.Id;
+                @await Html.PartialAsync("_TransactionsTable", transactions)
+            }
+            <hr>
+            <h3>File List</h3>
+            <form asp-controller="File" asp-action="UploadFile" method="post" asp-route-userId="@Model.Id" asp-route-page="@currentPage" enctype="multipart/form-data">
+                <input type="file" name="files" multiple>
+                <button type="submit" class="btn btn-primary bi bi-upload"></button>
+            </form>
+            @{await Html.RenderPartialAsync("_FileList", Model);}
+            <hr>
+            <h3>Video</h3>
+            <input type="file" id="fileInput" />
+            @* <button id="uploadBtn">上傳影片</button> *@
+            <button id="uploadBtn" class="btn btn-primary bi bi-upload"></button>
+
+            <progress id="progressBar" value="0" max="100" style="width: 300px;"></progress>
+            <p id="status"></p>
+            <div id = "videoList">
+                @{await Html.RenderPartialAsync("_VideoList", Model);}
+            </div>
+            <hr>
+            <div>
+                @{await Html.RenderPartialAsync("_TodoList");}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    window.videoConfig = {
+        currentPage: @currentPage,
+        userId: @Model.Id,
+    };
+</script>
+<script type="module" src="~/js/video-manager.js"></script>

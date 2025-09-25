@@ -1,0 +1,59 @@
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Text.Json;
+
+using WebApp.Models.Repositories;
+using WebApp.Models.Service;
+using WebApp.Models.TodoModel;
+[ApiController]
+[Route("api/[controller]")]
+public class TodoAPIController : ControllerBase
+{
+    private readonly ITodoService _service;
+    public TodoAPIController(ITodoService service)
+    {
+        _service = service;
+    }
+
+    [HttpPost("AddTodo")]
+    public async Task<IActionResult> AddTodo(Todo todo)
+    {
+        todo.time = DateTime.Now;
+        await _service.AddTodo(todo);
+        return Ok(todo);
+    }
+
+    [HttpGet("GetTodos")]
+    public async Task<IActionResult> GetTodos(int userId)
+    {
+        var todos = await _service.GetTodos(userId);
+        if (todos != null)
+            return Ok(todos);
+        else
+            return NoContent();
+    }
+
+    [HttpDelete("DeleteTodo/{todoId}")]
+    public async Task<IActionResult> DeleteTodo(int todoId)
+    {
+        var t = await _service.GetTodo(todoId);
+        if (t == null)
+            return NotFound();
+        await _service.DeleteTodo(todoId);
+        return Ok();
+    }
+
+    [HttpPut("Toggle/{todoId}")]
+    public async Task<IActionResult> Toggle(int todoId)
+    {
+        var todo = await _service.GetTodo(todoId);
+        if (todo != null)
+        {
+            todo.done = (todo.done) ? false : true;
+            await _service.UpdateTodo(todo);
+            return Ok(todo);
+        }
+        return NotFound();
+    }
+}

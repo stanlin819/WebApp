@@ -1,0 +1,76 @@
+@{
+    ViewData["Title"] = "影片上傳";
+}
+
+<h2>影片上傳</h2>
+
+<input type="file" id="fileInput" />
+<button id="uploadBtn">上傳影片</button>
+
+<progress id="progressBar" value="0" max="100" style="width: 300px;"></progress>
+<p id="status"></p>
+
+@section Scripts {
+    <script>
+        const CHUNK_SIZE = 2 * 1024 * 1024; // 5MB
+
+        document.getElementById("uploadBtn").addEventListener("click", async () => {
+            const file = document.getElementById("fileInput").files[0];
+            if (!file) return alert("請選擇影片");
+
+            const fileId = Date.now().toString(); // 簡單用時間戳作 fileId
+            const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+
+            const progressBar = document.getElementById("progressBar");
+            const statusText = document.getElementById("status");
+
+            async function uploadChunk(index) {
+                const start = index * CHUNK_SIZE;
+                const end = Math.min(start + CHUNK_SIZE, file.size);
+                const chunk = file.slice(start, end);
+
+                const form = new FormData();
+                form.append("chunk", chunk);
+                form.append("fileId", fileId);
+                form.append("chunkIndex", index);
+
+                await fetch("/Video/Chunk", {
+                    method: "POST",
+                    body: form
+                });
+            }
+
+            // 依序上傳 chunk
+            for (let i = 0; i < totalChunks; i++) {
+                await uploadChunk(i);
+                progressBar.value = ((i + 1) / totalChunks) * 100;
+                statusText.innerText = `已上傳 ${i + 1}/${totalChunks} 個分片`;
+            }
+
+            // 上傳完成後合併
+            const mergeForm = new FormData();
+            mergeForm.append("fileId", fileId);
+            mergeForm.append("filename", file.name);
+            mergeForm.append("totalChunks", totalChunks);
+
+            const res = await fetch("/Video/Merge", {
+                method: "POST",
+                body: mergeForm
+            });
+            const data = await res.json();
+            console.log(data.output);
+            if (data.ok) {
+                statusText.innerText = "影片上傳完成！";
+                const video = document.createElement("video");
+                video.src = data.output;
+                video.controls = true;
+                video.width = 640; 
+                video.height = 360;
+                video.preload= "auto";
+                document.body.appendChild(video);
+            } else {
+                statusText.innerText = "上傳失敗：" + (data.error || "未知錯誤");
+            }
+        });
+    </script>
+}

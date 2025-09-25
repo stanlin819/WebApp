@@ -1,0 +1,32 @@
+@{
+    ViewBag.Title = "Import Files";
+    var message = TempData["Warning"];
+    var comeFrom = ViewBag.comeFrom as String;
+}
+
+@if (message != null)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        @message
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+<form asp-controller="ImportExport" asp-action="@($"Import{comeFrom}File")" asp-route-comeFrom="@comeFrom" method="post" enctype="multipart/form-data">
+    <div class="form-group mt-3 mb-3">
+        <label><strong>Select Excel File</strong></label>
+        <input type="file" name="file" class="form-control"/>
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Import</button>
+        <button type="button" class="btn btn-warning dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            Convert To PDF
+        </button>
+        <ul class="dropdown-menu">
+            <button type="submit" class="btn btn-warning" formaction="@Url.Action("ConvertExcelToPdf", "ImportExport", new{cf = @comeFrom, package = "Aspose"})">Aspose</button>
+            <button type="submit" class="btn btn-warning" formaction="@Url.Action("ConvertExcelToPdf", "ImportExport", new{cf = @comeFrom, package = "GameBox"})">GameBox</button>
+            <button type="submit" class="btn btn-warning" formaction="@Url.Action("ConvertExcelToPdf", "ImportExport", new{cf = @comeFrom, package = "Syncfusion"})">Syncfusion</button>
+            <button type="submit" class="btn btn-warning" formaction="@Url.Action("ConvertExcelToPdf", "ImportExport", new{cf = @comeFrom, package = "Spire"})">Spire</button>
+            <button type="submit" class="btn btn-warning" formaction="@Url.Action("ConvertExcelToPdf", "ImportExport", new{cf = @comeFrom, package = "iLovePdf"})">iLovePdf</button>
+        </ul>
+    </div>
+</form>

@@ -1,0 +1,19 @@
+@{
+    ViewData["Title"] = "ViewData Test";
+}
+
+<h1>ViewData Test</h1>
+<h2>ViewData1: @ViewData["vd1"]</h2>
+
+<h2>ViewBag1: @ViewBag.vb1</h2>
+
+<h2>TempData1: @TempData["temp1"]</h2>
+
+
+<form asp-action = "OneRedirect" method="get">
+    <button type="submit"> Redirect To Next Action</button>
+</form>
+
+<form asp-action = "GetDIID" method="get">
+    <button type="submit"> DI Container Test</button>
+</form>

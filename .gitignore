@@ -1,0 +1,12 @@
+# Build Folders
+bin/
+obj/
+**/bin/
+**/obj/
+
+# User uploads / videos
+WebApp/wwwroot/video/
+WebApp/wwwroot/uploads/
+
+# VS Code
+.vscode/

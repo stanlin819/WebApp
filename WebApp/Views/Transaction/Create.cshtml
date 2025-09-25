@@ -1,0 +1,79 @@
+@model WebApp.Models.TransactionModel.Transaction
+@{
+    ViewBag.Title = "Create New Transaction";
+    var error = TempData["Error"];
+    var userName = ViewBag.UserName;
+    var userId = ViewBag.UserId;
+    var currentPage = ViewBag.CurrentPage;
+}
+@if (error != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @error
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1>@ViewBag.Title</h1>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <form asp-controller="Transaction" asp-action="Create" method="post">
+
+                        <div class="form-group mb-3">
+                            <label for="UserName" class="control-label">User Name</label>
+                            @if(userName != null){
+                                <input type="text" value="@userName" name="UserName" id="UserName" class="form-control" readonly/>
+                                <input type="hidden" value="@userId" name="userId" id="userId" class="form-control" readonly/>
+                                <input type="hidden" value="@currentPage" name="p" id="p" class="form-control" readonly/>
+                            }else{
+                                <input type="text" name="UserName" id="UserName" class="form-control" />
+                            }
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Title" class="control-label">Title</label>
+                            <input asp-for="Title" class="form-control"/>
+                        </div>
+            
+                        <div class="form-group mb-3">
+                            <label asp-for="Amount" class="control-label">Amount</label>
+                            <input asp-for="Amount" class="form-control" type="number" step="0.01" />
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Date" class="control-label">Date</label>
+                            <input asp-for="Date" class="form-control" type="date" value="@DateTime.Today.ToString("yyyy-MM-dd")"
+                                    min="@DateTime.Today.AddYears(-1).ToString("yyyy-MM-dd")" 
+                                    max="@DateTime.Today.ToString("yyyy-MM-dd")"  />
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Category" class="control-label">Category</label>
+                            <select asp-for="Category" class="form-select">
+                                <option value="">Select a category</option>
+                                <option value="Food">Food</option>
+                                <option value="Transport">Transport</option>
+                                <option value="Entertainment">Entertainment</option>
+                                <option value="Shopping">Shopping</option>
+                                <option value="Shopping">Work</option>
+                                <option value="Others">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Create</button>
+                            @if(userName != null){
+                                <a asp-controller="User" asp-action="Details" asp-route-id="@userId" asp-route-currentPage="@currentPage" class="btn btn-secondary">Cancle</a>
+                            }else{
+                                <a asp-controller="Transaction" asp-action="Index" class="btn btn-secondary">Back to List</a>
+                            }
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

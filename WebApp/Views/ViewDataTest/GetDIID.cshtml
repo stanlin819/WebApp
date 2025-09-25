@@ -1,0 +1,17 @@
+@{
+    ViewData["Title"] = "DI Container Test";
+}
+<h1>DI container lifecycle</h1>
+<h2>ScopedGuid_First: @ViewBag.ScopedGuid_First</h2>
+<h2>ScopedGuid_Second: @ViewBag.ScopedGuid_Second</h2>
+<hr>
+<h2>TransientGuid_First: @ViewBag.TransientGuid_First</h2>
+<h2>TransientGuid_Second: @ViewBag.TransientGuid_Second</h2>
+<hr>
+<h2>SingletonGuid_First: @ViewBag.SingletonGuid_First</h2>
+<h2>SingletonGuid_Second: @ViewBag.SingletonGuid_Second</h2>
+
+
+<form asp-action = "GetDIID" method="get">
+    <button type="submit"> Another Request</button>
+</form>

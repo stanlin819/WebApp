@@ -1,0 +1,81 @@
+@model IEnumerable<WebApp.Models.UserModel.UserViewModel>
+@{
+    ViewBag.Title = "User Overview";
+    var currentPage = Convert.ToInt32(ViewData["CurrentPage"] ?? 1);
+    var message = TempData["Message"];
+    var warning = TempData["Warning"];
+}
+
+@if (message != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @message
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (warning != null)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        @warning
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="mb-4">@ViewBag.Title</h1>
+            <div class="mb-3 d-flex justify-content-between align-items-center">
+                <a href="#" class="btn btn-primary" id="addUserBtn">
+                    <i class="bi bi-plus-circle"></i> Add New User
+                </a>
+                @* <a asp-controller="User" asp-action="DeleteAllUser" class="btn btn-danger">Delete All User</a> *@
+                <div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Export
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" asp-controller="ImportExport" asp-action="ExportAllUserToExcel">Excel</a></li>
+                            <li><a class="dropdown-item" asp-controller="ImportExport" asp-action="ExportAllUserToPDF">PDF</a></li>
+                        </ul>
+                    </div>
+                    <a asp-controller="ImportExport" asp-action="Import" asp-route-comeFrom="User" class="btn btn-warning">Import</a>
+                </div>
+            </div>
+            <div class="list-group mb-3" id="tableContainer">
+                @{Html.RenderPartial("_UsersTable", Model);}
+            </div>
+            <div id = "Pagination">
+                @await Html.PartialAsync("_Pagination")
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="createUserModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add New User</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="createUserModalBody">
+        <!-- AJAX 會把 Partial 載進來 -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    window.userUrls = {
+        createPartial: '@Url.Action("CreatePartial", "User")',
+        createAjax: '@Url.Action("CreateAjax", "User")',
+        usersTablePartial: '@Url.Action("UserTablePartial", "User", new {page = @currentPage})'
+    };
+    
+</script>
+
+<script src="~/js/user-create.js"></script>
+<script type="module" src="~/js/pagination.js"></script>

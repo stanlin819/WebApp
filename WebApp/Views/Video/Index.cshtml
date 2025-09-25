@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>YouTube IFrame API Demo</title>
+</head>
+<body>
+  <h2>YouTube IFrame API 測試</h2>
+
+  <!-- 播放器容器 -->
+<iframe credentialless id="existing-iframe-example"
+        width="640" height="360"
+        src="https://www.youtube.com/embed/M7lc1UVf-VE?enablejsapi=1&autoplay=1&mute=1"
+        frameborder="0"
+        style="border: solid 4px #37474F"
+></iframe><br>
+
+  <!-- 控制按鈕 -->
+  <button onclick="playVideo()">播放</button>
+  <button onclick="pauseVideo()">暫停</button>
+  <button onclick="stopVideo()">停止</button>
+  <button onclick="backward10()">後退 10 秒</button>
+  <button onclick="forward10()">前進 10 秒</button>
+
+<script>
+  var tag = document.createElement('script');
+  tag.setAttribute("src", "https://www.youtube.com/iframe_api");
+  @* tag.src = "https://www.youtube.com/iframe_api"; *@
+  var firstScriptTag = document.getElementsByTagName('script')[0];
+  firstScriptTag.before(tag);
+  @* firstScriptTag.parentNode.insertBefore(tag, firstScriptTag); *@
+
+  var player;
+  function onYouTubeIframeAPIReady() {
+    player = new YT.Player('existing-iframe-example', {
+        events: {
+          'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange
+        }
+    });
+  }
+  function onPlayerReady(event) {
+    document.getElementById('existing-iframe-example').style.borderColor = '#FF6D00';
+  }
+  function changeBorderColor(playerStatus) {
+    var color;
+    if (playerStatus == -1) {
+      color = "#37474F"; // unstarted = gray
+    } else if (playerStatus == 0) {
+      color = "#FFFF00"; // ended = yellow
+    } else if (playerStatus == 1) {
+      color = "#33691E"; // playing = green
+    } else if (playerStatus == 2) {
+      color = "#DD2C00"; // paused = red
+    } else if (playerStatus == 3) {
+      color = "#AA00FF"; // buffering = purple
+    } else if (playerStatus == 5) {
+      color = "#FF6DOO"; // video cued = orange
+    }
+    if (color) {
+      document.getElementById('existing-iframe-example').style.borderColor = color;
+    }
+  }
+  function onPlayerStateChange(event) {
+    changeBorderColor(event.data);
+  }
+
+  function playVideo() { console.log("start");if(player) player.playVideo(); }
+  function pauseVideo() { console.log("pause");if(player) player.pauseVideo(); }
+  function backward10() { console.log("backward");if(player) player.seekTo(player.getCurrentTime() - 10, true); }
+  function forward10() { console.log("forward");if(player) player.seekTo(player.getCurrentTime() + 10, true); }
+  function stopVideo() { console.log("stop");if(player) player.stopVideo();}
+</script>
+</body>
+</html>
