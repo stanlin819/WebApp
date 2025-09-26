@@ -94,5 +94,43 @@ namespace WebApp.Tests.Services
             // Assert
             _mockRepo.Verify(r => r.Update(todo), Times.Once);
         }
+
+        [Fact]
+        public async Task Toggle_ShouldReturnUpdatedTodo_WhenTodoExists()
+        {
+            // Arrange
+            int todoId = 1;
+            var todo = new Todo { Id = todoId, done = false };
+
+            _mockRepo.Setup(r => r.Get(todoId)).ReturnsAsync(todo);
+            _mockRepo.Setup(r => r.Update(todo)).Returns(Task.CompletedTask);
+
+            // Act
+            var result = await _service.Toggle(todoId);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(todoId, result.Id);
+            Assert.True(result.done); // 原本 false，應該被切換成 true
+            _mockRepo.Verify(r => r.Get(todoId), Times.Once);
+            _mockRepo.Verify(r => r.Update(todo), Times.Once);
+        }
+
+        [Fact]
+        public async Task Toggle_ShouldReturnNull_WhenTodoDoesNotExist()
+        {
+            // Arrange
+            int todoId = 99;
+
+            _mockRepo.Setup(r => r.Get(todoId)).ReturnsAsync((Todo)null);
+
+            // Act
+            var result = await _service.Toggle(todoId);
+
+            // Assert
+            Assert.Null(result);
+            _mockRepo.Verify(r => r.Get(todoId), Times.Once);
+            _mockRepo.Verify(r => r.Update(It.IsAny<Todo>()), Times.Never);
+        }
     }
 }

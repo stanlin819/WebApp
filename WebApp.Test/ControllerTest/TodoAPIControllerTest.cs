@@ -105,16 +105,14 @@ public class TodoAPIControllerTests
     }
 
     [Fact]
-    public async Task Toggle_ReturnsOkWithTodo_WhenTodoExists()
+    public async Task Toggle_ReturnsOk_WhenTodoExists()
     {
         // Arrange
         int todoId = 1;
         var todo = new Todo { Id = todoId, done = false };
 
-        _mockService.Setup(s => s.GetTodo(todoId))
+        _mockService.Setup(s => s.Toggle(todoId))
                     .ReturnsAsync(todo);
-        _mockService.Setup(s => s.UpdateTodo(todo))
-                    .Returns(Task.CompletedTask);
 
         // Act
         var result = await _controller.Toggle(todoId);
@@ -122,16 +120,17 @@ public class TodoAPIControllerTests
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
         var returnedTodo = Assert.IsType<Todo>(okResult.Value);
-        Assert.True(returnedTodo.done);
+        Assert.Equal(todoId, returnedTodo.Id);
     }
 
     [Fact]
     public async Task Toggle_ReturnsNotFound_WhenTodoDoesNotExist()
     {
         // Arrange
-        int todoId = 1;
-        _mockService.Setup(s => s.GetTodo(todoId))
-                    .ReturnsAsync((Todo)null);
+        int todoId = 99;
+
+        _mockService.Setup(s => s.Toggle(todoId))
+                    .ReturnsAsync((Todo)null); // 模擬找不到 Todo
 
         // Act
         var result = await _controller.Toggle(todoId);
