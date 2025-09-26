@@ -11,4 +11,5 @@ public interface ITodoService
     Task<Todo> GetTodo(int todoId);
     Task DeleteTodo(int id);
     Task UpdateTodo(Todo todo);
+    Task<Todo> Toggle(int todoId);
 }

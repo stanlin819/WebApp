@@ -17,7 +17,8 @@
 
 services:
   server:
-    image: billmanage:latest
+    #image: billmanage:latest
+    image: youxuan0714/webapp:latest 
     ports:
       - "8080:8080"
     volumes:

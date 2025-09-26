@@ -47,11 +47,9 @@ public class TodoAPIController : ControllerBase
     [HttpPut("Toggle/{todoId}")]
     public async Task<IActionResult> Toggle(int todoId)
     {
-        var todo = await _service.GetTodo(todoId);
+        var todo = await _service.Toggle(todoId);
         if (todo != null)
         {
-            todo.done = (todo.done) ? false : true;
-            await _service.UpdateTodo(todo);
             return Ok(todo);
         }
         return NotFound();

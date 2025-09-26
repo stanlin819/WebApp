@@ -39,4 +39,15 @@ public class TodoService : ITodoService
     {
         await _repo.Update(todo);
     }
+
+    public async Task<Todo> Toggle(int todoId)
+    {
+        var todo = await _repo.Get(todoId);
+        if (todo == null)
+            return null;
+        todo.done = (todo.done) ? false : true;
+        await _repo.Update(todo);
+        return todo;
+
+    }
 }
