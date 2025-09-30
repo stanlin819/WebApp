@@ -1,0 +1,58 @@
+@model WebApp.Models.TransactionModel.Transaction
+@{
+    var userName = ViewBag.UserName;
+    var userId = ViewBag.UserId;
+    var currentPage = ViewBag.CurrentPage;
+}
+<form action="@Url.Action("Create", "Transaction")">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="mb-3">
+        <label for="UserName" class="form-label">User Name</label>
+        @if(userName != null){
+            <input type="text" value="@userName" name="UserName" id="UserName" class="form-control" readonly />
+            <input type="hidden" value="@userId" name="userId" id="userId" />
+            <input type="hidden" value="@currentPage" name="p" id="p" />
+        }else{
+            <input type="text" name="UserName" id="UserName" class="form-control" />
+        }
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Title" class="form-label">Title</label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Amount" class="form-label">Amount</label>
+        <input asp-for="Amount" class="form-control" type="number" step="0.01" min="0" />
+        <span asp-validation-for="Amount" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Date" class="form-label">Date</label>
+        <input asp-for="Date" class="form-control" type="date" value="@DateTime.Today.ToString("yyyy-MM-dd")"
+               min="@DateTime.Today.AddYears(-1).ToString("yyyy-MM-dd")"
+               max="@DateTime.Today.ToString("yyyy-MM-dd")" />
+        <span asp-validation-for="Date" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Category" class="form-label">Category</label>
+        <select asp-for="Category" class="form-select">
+            <option value="">Select a category</option>
+            <option value="Food">Food</option>
+            <option value="Transport">Transport</option>
+            <option value="Entertainment">Entertainment</option>
+            <option value="Shopping">Shopping</option>
+            <option value="Work">Work</option>
+            <option value="Others">Other</option>
+        </select>
+        <span asp-validation-for="Category" class="text-danger"></span>
+    </div>
+
+    <div class="d-flex justify-content-end">
+        <button type="submit" class="btn btn-primary me-2">Create</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+    </div>
+</form>
