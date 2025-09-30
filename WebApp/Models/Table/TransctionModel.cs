@@ -1,17 +1,30 @@
 using WebApp.Models.UserModel;
 namespace WebApp.Models.TransactionModel;
+
 using System.Text.Json.Serialization;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 
 public class Transaction : IObject
 {
     public int Id { get; set; }
+
+    [Required(ErrorMessage = "Please input Title")]
     public string Title { get; set; }
+
+    [Required(ErrorMessage = "Amount is required")]
+    [Range(0, double.MaxValue, ErrorMessage = "Amount must be greater than or equal to 0")]
     public decimal Amount { get; set; }
+
+    [Required(ErrorMessage = "Date is required")]
     public DateTime Date { get; set; }
+
+    [Required(ErrorMessage = "Please select Category")]
     public string Category { get; set; } // 餐飲/交通/娛樂
     public bool IsIncome { get; set; }
     public int UserId { get; set; }
+    [ValidateNever]
     [JsonIgnore]
     public User User { get; set; }
 
