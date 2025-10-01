@@ -28,5 +28,7 @@
 **/obj
 **/secrets.dev.yaml
 **/values.dev.yaml
+**/wwwroot/uploads
+**/wwwroot/video
 LICENSE
 README.md

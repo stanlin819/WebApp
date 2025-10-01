@@ -244,8 +244,11 @@ public class UserController : Controller
         foreach (var limit in limits)
         {
             var budget = budgets.Where(b => b.Category.Equals(limit.Key)).FirstOrDefault();
-            budget.setLimit(limit.Value);
-            await _budget_service.UpdateBudget(budget);
+            if (budget != null)
+            {
+                budget.setLimit(limit.Value);
+                await _budget_service.UpdateBudget(budget);   
+            }
         }
 
         return RedirectToAction("Details", new { id, currentPage });

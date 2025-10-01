@@ -6,6 +6,7 @@ using System.Text.Json;
 using WebApp.Models.Repositories;
 using WebApp.Models.Service;
 using WebApp.Models.TodoModel;
+
 [ApiController]
 [Route("api/[controller]")]
 public class TodoAPIController : ControllerBase
@@ -17,7 +18,7 @@ public class TodoAPIController : ControllerBase
     }
 
     [HttpPost("AddTodo")]
-    public async Task<IActionResult> AddTodo(Todo todo)
+    public async Task<IActionResult> AddTodo([FromForm] Todo todo)
     {
         todo.time = DateTime.Now;
         await _service.AddTodo(todo);
@@ -44,7 +45,7 @@ public class TodoAPIController : ControllerBase
         return Ok();
     }
 
-    [HttpPut("Toggle/{todoId}")]
+    [HttpPatch("Toggle/{todoId}")]
     public async Task<IActionResult> Toggle(int todoId)
     {
         var todo = await _service.Toggle(todoId);

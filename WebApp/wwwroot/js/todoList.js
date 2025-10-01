@@ -10,25 +10,25 @@ $(document).ready(() =>{
         }
         $("#errorMsg").text("");
 
-        $.ajax({
-            url: "/api/TodoAPI/AddTodo",
-            type: "POST",
-            contentType: "application/json",
-            data: JSON.stringify({ text: todoText, userId: userId }),
-            dataType: "json",
-            success: function(todo) {
-                renderTodo(todo);
-                $("#todoInput").val("");
-            },
-            error: function(xhr, status, error) { // 失敗時執行
-                console.error("An error occurred:", error);
-            },
-        });
-
-        // $.post("/api/TodoAPI/AddTodo", { text: todoText, userId: userId }, function(todo){
-        //     renderTodo(todo);
-        //     $("#todoInput").val("");
+        // $.ajax({
+        //     url: "/api/TodoAPI/AddTodo",
+        //     type: "POST",
+        //     contentType: "application/json",
+        //     data: JSON.stringify({ text: todoText, userId: userId }),
+        //     dataType: "json",
+        //     success: function(todo) {
+        //         renderTodo(todo);
+        //         $("#todoInput").val("");
+        //     },
+        //     error: function(xhr, status, error) { // 失敗時執行
+        //         console.error("An error occurred:", error);
+        //     },
         // });
+
+        $.post("/api/TodoAPI/AddTodo", { text: todoText, userId: userId }, function(todo){
+            renderTodo(todo);
+            $("#todoInput").val("");
+        });
     });
 
     $("#todoList").on("click", "li", function(){
@@ -38,8 +38,8 @@ $(document).ready(() =>{
         // })
 
         $.ajax({
-            url: "/api/TodoAPI/Toggle/" + $(this).attr("data-id"),
-            type: "PUT", // 指定 PUT
+            url: "/api/TodoAPI/Toggle/" + $(this).data("id"),
+            type: "PATCH", // 指定 PATCH
             success: function() {
                 $(this).toggleClass("done");
             }.bind(this),
@@ -61,9 +61,7 @@ $(document).ready(() =>{
 function renderTodo(todo){
     let li = $("<li>");
     let deleteBtn = $("<a>").attr("style", "display: inline; color: red;");
-    let trash = $("<i>").attr({"id": "deleteBtn"});
-    trash.addClass("bi bi-trash")
-    deleteBtn.append(trash);
+    deleteBtn.addClass("bi bi-trash");
 
     deleteBtn.click(function(e){
         e.stopPropagation()

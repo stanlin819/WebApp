@@ -114,28 +114,16 @@ public class TransactionController : Controller
 
     public async Task<IActionResult> Delete(int Id, int userId, int page)
     {
-        try
+        await _service.DeleteTransaction(Id);
+
+        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
         {
-            await _service.DeleteTransaction(Id);
-
-            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
-            {
-                return Json(new { success = true });
-            }
-
-            TempData["Message"] = "Transaction deleted successfully.";
-            return RedirectToAction("Details", "User", new { id = userId, currentPage = page });
+            return Json(new { success = true });
         }
-        catch (Exception ex)
-        {
-            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
-            {
-                return Json(new { success = false, message = "Failed to delete transaction" });
-            }
 
-            TempData["Error"] = "Failed to delete transaction.";
-            return RedirectToAction("Details", "User", new { id = userId, currentPage = page });
-        }
+        TempData["Message"] = "Transaction deleted successfully.";
+        return RedirectToAction("Details", "User", new { id = userId, currentPage = page });
+
     }
 
     [HttpGet]

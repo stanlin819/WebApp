@@ -17,7 +17,7 @@
 
 services:
   server:
-    #image: billmanage:latest
+    # image: webapp:ignore
     image: youxuan0714/webapp:latest 
     ports:
       - "8080:8080"
