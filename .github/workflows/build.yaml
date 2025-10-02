@@ -1,4 +1,4 @@
-name: Build Solution
+name: Build and Test
 
 on:
   push:
@@ -9,6 +9,10 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest   # 使用 GitHub 提供的 Ubuntu runner
+    strategy:
+        matrix:
+            testproj:
+                - WebApp.Test/WebApp.Test.csproj
 
     steps:
     - name: Checkout code
@@ -24,10 +28,6 @@ jobs:
 
     - name: Build
       run: dotnet build project.sln --configuration Release --no-restore
-
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: build-artifacts
-        path: |
-          **/bin/Release/
+    
+    - name: Run tests
+      run: dotnet test ${{ matrix.testproj }} --configuration Release --no-build --verbosity normal
