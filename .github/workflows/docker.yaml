@@ -8,6 +8,19 @@ on:
 jobs:
   docker:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}  # 只在測試成功時執行
+    strategy:
+      matrix:
+        project:
+          - name: webapp
+            context: WebApp/
+            dockerfile: Dockerfile  # 可以指定不同的 Dockerfile 名稱
+          # 之後可以加入更多專案，例如：
+          # - name: api
+          #   context: Api/
+          #   dockerfile: Dockerfile.prod  # 例如使用生產環境的 Dockerfile
+      fail-fast: false  # 讓一個專案失敗時其他專案仍繼續執行
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -19,7 +32,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Docker image
-        run: docker build -f WebApp/Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/webapp:latest WebApp/
+        run: docker build -f ${{ matrix.project.context }}/${{ matrix.project.dockerfile || 'Dockerfile' }} -t ${{ secrets.DOCKER_USERNAME }}/${{ matrix.project.name }}:latest ${{ matrix.project.context }}
 
       - name: Push Docker image
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/webapp:latest
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/${{ matrix.project.name }}:latest

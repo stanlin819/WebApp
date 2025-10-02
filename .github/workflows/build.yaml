@@ -7,8 +7,15 @@ on:
     branches: [ "main" ]   # PR 時也觸發
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
+    test:
+        runs-on: ubuntu-latest   # 使用 GitHub 提供的 Ubuntu runner
+        strategy:
+            matrix:
+                testproj:
+                    - WebApp.Test/WebApp.Test.csproj
+                    # Add more test projects here when needed
+            fail-fast: false    # 讓其他測試持續執行，即使有一個失敗
+
         steps:
             - name: Checkout code
               uses: actions/checkout@v4   # 把程式碼抓下來
@@ -21,40 +28,7 @@ jobs:
             - name: Restore dependencies
               run: dotnet restore
 
-            - name: Build
-              run: dotnet build --configuration Release --no-restore
-
-            - name: Upload build artifacts
-              uses: actions/upload-artifact@v4
-              with:
-                name: build-output
-                path: |
-                  **/bin/Release/
-                  **/obj/Release/
-
-    test:
-        runs-on: ubuntu-latest   # 使用 GitHub 提供的 Ubuntu runner
-        needs: build
-        strategy:
-            matrix:
-                testproj:
-                    - WebApp.Test/WebApp.Test.csproj
-                    # Add more test projects here when needed
-
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v4   # 把程式碼抓下來
-
-            - name: Setup .NET
-              uses: actions/setup-dotnet@v4
-              with:
-                dotnet-version: '9.0.x'   # 安裝 .NET 9
-
-            - name: Download build artifacts
-              uses: actions/download-artifact@v4
-              with:
-                name: build-output
-                path: .
-
-            - name: Test
-              run: dotnet test ${{ matrix.testproj }} --configuration Release --no-build --verbosity normal
+            - name: Build and Test
+              run: |
+                dotnet build --configuration Release --no-restore
+                dotnet test ${{ matrix.testproj }} --configuration Release --verbosity normal
