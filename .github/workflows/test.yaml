@@ -1,0 +1,35 @@
+name: Run Tests
+
+on:
+    workflow_run:
+        workflows: ["Build Solution"]
+        types:
+          - completed
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                testproj:
+                    - WebApp.Test/WebApp.Test.csproj
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+            
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v4
+              with:
+                dotnet-version: '9.0.x'
+            
+            - name: Download build artifacts
+              uses: actions/download-artifact@v3
+              with:
+                name: build-artifact
+                path: ./build
+            
+            - name: Run tests
+              run: dotnet test ${{ matrix.testproj }} --configuration Release --no-build --verbosity normal
+
+
+

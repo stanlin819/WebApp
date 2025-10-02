@@ -1,0 +1,33 @@
+name: Build Solution
+
+on:
+  push:
+    branches: [ "main" ]   # push 到 main 分支就觸發
+  pull_request:
+    branches: [ "main" ]   # PR 時也觸發
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest   # 使用 GitHub 提供的 Ubuntu runner
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4   # 把程式碼抓下來
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'   # 安裝 .NET 9
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build project.sln --configuration Release --no-restore
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-artifacts
+        path: |
+          **/bin/Release/
