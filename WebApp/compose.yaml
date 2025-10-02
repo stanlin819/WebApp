@@ -22,8 +22,8 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - user_file:/app/wwwroot/uploads 
-      - user_video:/app/wwwroot/video 
+      - user_file:/app/wwwroot/uploads
+      - user_video:/app/wwwroot/video
     depends_on:
       - sql_server
 

@@ -34,6 +34,7 @@ public class TodoAPIControllerTests
         var okResult = Assert.IsType<OkObjectResult>(result);
         var returnedTodo = Assert.IsType<Todo>(okResult.Value);
         Assert.Equal(todo.text, returnedTodo.text);
+        Assert.NotEqual(default(DateTime), returnedTodo.time);
     }
 
     [Fact]

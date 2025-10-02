@@ -69,7 +69,8 @@ public class WebSocketService
                 // 前端傳來 JSON 告知 fileId 或完成訊息
                 var msg = Encoding.UTF8.GetString(buffer, 0, result.Count);
                 var data = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(msg);
-
+                if (data == null)
+                    return;
                 var action = data["action"].ToString();
 
 
@@ -87,7 +88,7 @@ public class WebSocketService
                 }
                 else if (action.Equals("END"))
                 {
-                    await FinishFile(videoId, userId);
+                    FinishFile(videoId, userId);
                 }
             }
 
@@ -133,7 +134,7 @@ public class WebSocketService
     }
 
     // 關閉檔案
-    public async Task FinishFile(string fileId, string userId)
+    public void FinishFile(string fileId, string userId)
     {
         if (_files.TryRemove(fileId, out var fs))
         {

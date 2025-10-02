@@ -43,7 +43,7 @@
                 </div>
             </div>
             <div class="list-group mb-3" id="tableContainer">
-                @{Html.RenderPartial("_UsersTable", Model);}
+                @{await Html.RenderPartialAsync("_UsersTable", Model);}
             </div>
             <div id = "Pagination">
                 @await Html.PartialAsync("_Pagination")
@@ -51,7 +51,6 @@
         </div>
     </div>
 </div>
-
 
 <!-- Modal -->
 <div class="modal fade" id="createUserModal" tabindex="-1" aria-hidden="true">

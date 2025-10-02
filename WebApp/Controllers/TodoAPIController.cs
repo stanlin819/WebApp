@@ -29,10 +29,11 @@ public class TodoAPIController : ControllerBase
     public async Task<IActionResult> GetTodos(int userId)
     {
         var todos = await _service.GetTodos(userId);
-        if (todos != null)
-            return Ok(todos);
-        else
+        if (todos == null ||　todos.Count <= 0)
+        {
             return NoContent();
+        }
+        return Ok(todos);
     }
 
     [HttpDelete("DeleteTodo/{todoId}")]
