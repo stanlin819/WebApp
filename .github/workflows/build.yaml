@@ -29,9 +29,10 @@ jobs:
               with:
                 name: build-output
                 path: '**/bin/Release/'
-                
-    build-and-test:
+
+    test:
         runs-on: ubuntu-latest   # 使用 GitHub 提供的 Ubuntu runner
+        needs: build
         strategy:
             matrix:
                 testproj:
