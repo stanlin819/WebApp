@@ -23,7 +23,7 @@ jobs:
       run: dotnet restore
 
     - name: Build
-      run: dotnet build WebApp.sln --configuration Release --no-restore
+      run: dotnet build project.sln --configuration Release --no-restore
 
     - name: Run tests
       run: dotnet test WebApp.Test/WebApp.Test.csproj --no-build --verbosity normal
