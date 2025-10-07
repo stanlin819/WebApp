@@ -1,0 +1,24 @@
+@model int
+<div class="btn-group">
+    <a asp-controller="ImportExport" asp-action="SendUserReport" asp-route-id="@Model" 
+       class="btn btn-success">
+        <i class="bi bi-mailbox"></i> Send Report
+    </a>
+    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+        Export Report
+    </button>
+    <ul class="dropdown-menu">
+        <li><a class="dropdown-item" asp-controller="ImportExport" asp-action="UserReport" 
+               asp-route-id="@Model">Default</a></li>
+        <li><a class="dropdown-item" asp-controller="ImportExport" asp-action="UserReportFromTemplate" 
+               asp-route-id="@Model">From Template</a></li>
+        <li><a class="dropdown-item" asp-controller="ImportExport" asp-action="UserReportPdf" 
+               asp-route-id="@Model">Default - PDF</a></li>
+        <li><a class="dropdown-item" asp-controller="ImportExport" asp-action="UserReportFromTemplatPdf" 
+               asp-route-id="@Model">From Template - PDF</a></li>
+        <li><a class="dropdown-item" asp-controller="ImportExport" asp-action="UserReportPdf" 
+               asp-route-id="@Model" asp-route-watermark="@true">Default - PDF (Paid)</a></li>
+        <li><a class="dropdown-item" asp-controller="ImportExport" asp-action="UserReportFromTemplatPdf" 
+               asp-route-id="@Model" asp-route-watermark="@true">From Template - PDF (Paid)</a></li>
+    </ul>
+</div>

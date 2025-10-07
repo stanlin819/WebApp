@@ -274,7 +274,7 @@ public class FileService : IFileService
             }
             await RemoveFiles(deleteFile, group.Key);
         }
-        Directory.Delete(_uploadPath);
+        Directory.Delete(_uploadPath, recursive: true);
         Directory.CreateDirectory(_uploadPath);
     }
 

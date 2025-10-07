@@ -212,7 +212,7 @@ public class UserController : Controller
         var files = await _file_service.GetUserFiles(user.Id);
         var videos = await _video_service.GetUserVideos(user.Id);
 
-        var categoryDistribution = await _transaction_service.GetCategoryDistribution(id);
+        var categoryDistribution = await _transaction_service.GetCategoryDistribution(user.Id);
 
         ViewBag.ComeFrom = comeFrom;
         ViewBag.Files = files;

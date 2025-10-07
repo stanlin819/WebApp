@@ -133,7 +133,7 @@ public class ImportExportService : IImportExportService
                 worksheet.Cells[row, 1].Value = transaction.Title;
                 worksheet.Cells[row, 2].Value = transaction.Amount;
                 worksheet.Cells[row, 3].Value = transaction.Date.ToString("yyyy-MM-dd");
-                worksheet.Cells[row, 4].Value = transaction.Category;
+                worksheet.Cells[row, 4].Value = transaction.Category.ToString();
                 var user = await _userservice.GetUser(transaction.UserId);
                 worksheet.Cells[row, 5].Value = user.Username;
                 row++;
@@ -175,7 +175,7 @@ public class ImportExportService : IImportExportService
             table.AddCell(transaction.Title);
             table.AddCell(transaction.Amount.ToString());
             table.AddCell(transaction.Date.ToString("yyyy-MM-dd"));
-            table.AddCell(transaction.Category);
+            table.AddCell(transaction.Category.ToString());
             table.AddCell(transaction.UserName);
         }
 
@@ -350,13 +350,21 @@ public class ImportExportService : IImportExportService
                         string title = columnMap.ContainsKey("title") ? worksheet.Cells[row, columnMap["title"]].Text.Trim() : null;
                         decimal amount = columnMap.ContainsKey("amount") ? decimal.Parse(worksheet.Cells[row, columnMap["amount"]].Text.Trim()) : 0;
                         DateTime date = columnMap.ContainsKey("date") ? DateTime.Parse(worksheet.Cells[row, columnMap["date"]].Text.Trim()) : DateTime.Now;
-                        string category = columnMap.ContainsKey("category") ? worksheet.Cells[row, columnMap["category"]].Text.Trim() : null;
                         string username = columnMap.ContainsKey("user") ? worksheet.Cells[row, columnMap["user"]].Text.Trim() : null;
 
                         if (string.IsNullOrEmpty(title) || amount == 0 || string.IsNullOrEmpty(username))
                             continue;
+                        WebApp.Models.TransactionModel.Category category = WebApp.Models.TransactionModel.Category.Others; // 預設值
+                        if (columnMap.ContainsKey("category"))
+                        {
+                            string categoryStr = worksheet.Cells[row, columnMap["category"]].Text.Trim();
+                            if (Enum.TryParse<WebApp.Models.TransactionModel.Category>(categoryStr, true, out WebApp.Models.TransactionModel.Category parsedCategory))
+                            {
+                                category = parsedCategory;
+                            }
+                        }
 
-                        var isIncome = category != null && category.Equals("Work");
+                        var isIncome = category == WebApp.Models.TransactionModel.Category.Work;
 
 
                         var user = await _userservice.GetUserByUsername(username);
@@ -455,7 +463,7 @@ public class ImportExportService : IImportExportService
                 TableRow row = new TableRow();
                 row.Append(CreateTableCell(t.Title ?? ""));
                 row.Append(CreateTableCell(t.Date.ToString("yyyy-MM-dd")));
-                row.Append(CreateTableCell(t.Category ?? ""));
+                row.Append(CreateTableCell(t.Category.ToString()));
                 row.Append(CreateTableCell(t.Amount.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-US"))));
                 row.Append(CreateTableCell(t.IsIncome ? "Income" : "Expense"));
                 table.Append(row);
@@ -627,7 +635,7 @@ public class ImportExportService : IImportExportService
 
                         SetCellText(cells[0], transaction.Title);
                         SetCellText(cells[1], transaction.Date.ToString("yyyy-MM-dd"));
-                        SetCellText(cells[2], transaction.Category);
+                        SetCellText(cells[2], transaction.Category.ToString());
                         SetCellText(cells[3], transaction.Amount.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-US")));
                         SetCellText(cells[4], transaction.IsIncome ? "Income" : "Expense");
 

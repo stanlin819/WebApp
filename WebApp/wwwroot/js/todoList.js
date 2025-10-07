@@ -1,4 +1,16 @@
 $(document).ready(() =>{
+    $.ajaxSetup({
+        contentType: "application/json",
+    });
+
+    $(document).ajaxStart(function() {
+        $("#loadingSpinner").show();
+    });
+
+    $(document).ajaxStop(function() {
+        $("#loadingSpinner").hide();
+    });
+
     const userId = window.videoConfig.userId;
     $("#todoForm").on("submit", (e) =>{
         e.preventDefault();
@@ -10,22 +22,7 @@ $(document).ready(() =>{
         }
         $("#errorMsg").text("");
 
-        // $.ajax({
-        //     url: "/api/TodoAPI/AddTodo",
-        //     type: "POST",
-        //     contentType: "application/json",
-        //     data: JSON.stringify({ text: todoText, userId: userId }),
-        //     dataType: "json",
-        //     success: function(todo) {
-        //         renderTodo(todo);
-        //         $("#todoInput").val("");
-        //     },
-        //     error: function(xhr, status, error) { // 失敗時執行
-        //         console.error("An error occurred:", error);
-        //     },
-        // });
-
-        $.post("/api/TodoAPI/AddTodo", { text: todoText, userId: userId }, function(todo){
+        $.post("/api/TodoAPI/AddTodo", JSON.stringify({ text: todoText, userId: userId }), function(todo){
             renderTodo(todo);
             $("#todoInput").val("");
         });
@@ -76,7 +73,7 @@ function renderTodo(todo){
             type: "DELETE",
             success: function() {
                 li.remove();
-            }.bind(this),
+            },
             error: function(xhr, status, error) {
                 console.error("An error occurred:", error);
             }
@@ -87,6 +84,5 @@ function renderTodo(todo){
     if(todo.done) li.addClass("done");
     li.append(todo.text);
     li.append(deleteBtn);
-    $("#todoList").append(li);
-
+    $("ul[id = 'todoList']").append(li);
 }

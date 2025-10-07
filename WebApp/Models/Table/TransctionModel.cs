@@ -21,7 +21,8 @@ public class Transaction : IObject
     public DateTime Date { get; set; }
 
     [Required(ErrorMessage = "Please select Category")]
-    public string Category { get; set; } // 餐飲/交通/娛樂
+    [Range(1, int.MaxValue, ErrorMessage = "Please select a valid category.")] 
+    public Category Category { get; set; } // 餐飲/交通/娛樂
     public bool IsIncome { get; set; }
     public int UserId { get; set; }
     [ValidateNever]
@@ -30,14 +31,14 @@ public class Transaction : IObject
 
     public Transaction() { }
 
-    public Transaction(int id, string title, decimal amount, string category, bool isincome, int userid)
+    public Transaction(int id, string title, decimal amount, Category category, bool isIncome, int userId)
     {
         Id = id;
         Title = title;
         Date = DateTime.Now;
         Category = category;
-        IsIncome = isincome;
-        UserId = userid;
+        IsIncome = isIncome;
+        UserId = userId;
     }
 
     public void SetUserId(int userId)
@@ -45,16 +46,9 @@ public class Transaction : IObject
         UserId = userId;
     }
 
-    public void SerIncome()
+    public void SetIncome()
     {
-        if (Category.Equals("Work"))
-        {
-            IsIncome = true;
-        }
-        else
-        {
-            IsIncome = false;
-        }
+        IsIncome = Category == Category.Work;
     }
     public override string ToString()
     {
@@ -66,8 +60,18 @@ public class TransactionViewModel
     public string Title { get; set; }
     public decimal Amount { get; set; }
     public DateTime Date { get; set; }
-    public string Category { get; set; }
+    public Category Category { get; set; }
     public bool IsIncome { get; set; }
     public string UserName { get; set; }
     public int Id { get; set; }
+}
+
+public enum Category{
+    None = 0,
+    Food,           // 餐飲
+    Transport,      // 交通
+    Entertainment,  // 娛樂
+    Shopping,      // 購物
+    Work,          // 工作
+    Others         // 其他
 }

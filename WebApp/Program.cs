@@ -28,6 +28,10 @@ public class Program
             builder.Configuration.GetSection("VideoUploadSetting")
         );
 
+        builder.Services.Configure<MailSettingOptions>(
+            builder.Configuration.GetSection("MailAccountSetting")
+        );
+
         var assembly = Assembly.GetExecutingAssembly();
 
         // 註冊所有依賴

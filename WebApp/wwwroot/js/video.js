@@ -1,5 +1,5 @@
 export async function uploadVideo(CHUNK_SIZE, userId){
-    const file = document.getElementById("fileInput").files[0];
+    const file = document.getElementById("videoInput").files[0];
     if (!file) return alert("請選擇影片");
 
     // UploadWithWebSocket(file, userId);

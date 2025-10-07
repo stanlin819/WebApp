@@ -36,7 +36,7 @@ public class TransactionService : ITransactionService
     {
         var transactions = await _repo.GetUserTransactions(userId);
         return transactions
-            .GroupBy(t => t.Category)
+            .GroupBy(t => t.Category.ToString())  // 將列舉轉換為字串
             .ToDictionary(g => g.Key, g => g.Sum(t => t.Amount));
     }
 
@@ -47,7 +47,7 @@ public class TransactionService : ITransactionService
     public async Task<String> AddTransaction(Transaction transaction, int userId)
     {
         transaction.SetUserId(userId);
-        transaction.SerIncome();
+        transaction.SetIncome();
         return await _repo.Add(transaction);
     }
     public async Task<Dictionary<string, string>> AddTransactions(IEnumerable<TransactionViewModel> transactions)
@@ -90,7 +90,7 @@ public class TransactionService : ITransactionService
                 Amount = jt.Transaction.Amount,
                 Date = jt.Transaction.Date,
                 Category = jt.Transaction.Category,
-                IsIncome = jt.Transaction.Category.Equals("Work"),
+                IsIncome = jt.Transaction.Category == Category.Work,
                 UserId = jt.UserId
             }).ToList();
 

@@ -11,3 +11,5 @@ WebApp/wwwroot/tmp_chunks/
 
 # VS Code
 .vscode/
+
+.fake
