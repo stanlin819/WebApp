@@ -13,6 +13,7 @@ jobs:
             matrix:
                 testproj:
                     - WebApp.Test/WebApp.Test.csproj
+                    - WebApp.API.Test/WebApp.API.Test.csproj
                     # Add more test projects here when needed
             fail-fast: false    # 讓其他測試持續執行，即使有一個失敗
 
