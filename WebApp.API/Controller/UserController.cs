@@ -6,9 +6,9 @@ using WebApp.API.Service;
 [Route("api/[controller]")]
 public class UserAPIController : ControllerBase
 {
-    private readonly UserService _service;
+    private readonly IUserService _service;
 
-    public UserAPIController(UserService service)
+    public UserAPIController(IUserService service)
     {
         _service = service;
     }
@@ -35,5 +35,35 @@ public class UserAPIController : ControllerBase
     {
         await _service.AddUser(user);
         return Ok(user);
+    }
+
+    [HttpDelete("DeleteUser/{userId}")]
+    public async Task<IActionResult> DeleteUser(int userId)
+    {
+        var u = await _service.GetUser(userId);
+        if (u == null)
+            return NotFound(new { message = $"User with ID {userId} not found" });
+        var mes = await _service.DeleteUser(userId);
+        return Ok(new { message = mes });
+
+    }
+    
+    [HttpPut("UpdateUser")]
+    public async Task<IActionResult> UpdateUser(User user)
+    {
+        // 更新用戶
+        var result = await _service.UpdateUser(user);
+        
+        // 檢查更新結果
+        if (result.Contains("not found"))
+        {
+            return NotFound(new { message = result });
+        }
+        else if (result.Contains("already exists"))
+        {
+            return BadRequest(new { message = result });
+        }
+        
+        return Ok(new { message = result });
     }
 }

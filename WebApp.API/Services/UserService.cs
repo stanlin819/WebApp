@@ -2,11 +2,11 @@
 using WebApp.API.Repositories;
 namespace WebApp.API.Service;
 
-public class UserService
+public class UserService : IUserService
 {
-    private readonly UserRepository _repo;
+    private readonly IUserRepository _repo;
 
-    public UserService(UserRepository repo)
+    public UserService(IUserRepository repo)
     {
         _repo = repo;
     }
@@ -23,98 +23,137 @@ public class UserService
 
     public async Task<User> GetUserByUsername(string userName)
     {
-        return await _repo.GetByUsername(userName);
+        return await _repo.GetByUserName(userName);
     }
 
-    public async Task<Dictionary<string, string>> AddUser(User user)
+    public async Task<User> AddUser(User user)
     {
-        var mes = new Dictionary<string, string>();
-        var existingUsers = await _repo.GetAll();
-        var existingUsernames = existingUsers.Select(u => u.Username).ToHashSet();
-        if (existingUsernames.Contains(user.Username))
+        // 檢查用戶名是否存在
+        var existingUser = await GetUserByUsername(user.Username);
+        if (existingUser != null)
         {
-            mes["isSuccess"] = "false";
-            mes["Message"] = $"{user.Username} already exists.";
+            return null; // 用戶名已存在
         }
-        else
-        {
-            await _repo.Add(user);
-            mes["isSuccess"] = "true";
-            mes["Message"] = $"{user.Username} created successfully.";
-        }
-        return mes;
+
+        var addedUser = await _repo.Add(user);
+        return addedUser;
     }
-    public async Task<Dictionary<string,string>> AddUsers(IEnumerable<User> users)
+    public async Task<string> AddUsers(IEnumerable<User> users)
     {
-        var mes = new Dictionary<string, string>();
+        var userList = users.ToList();
+        if (!userList.Any())
+        {
+            return string.Empty;
+        }
 
+        // 取得所有現有用戶名稱
         var existingUsers = await _repo.GetAll();
-        var existingUsernames = existingUsers.Select(u => u.Username).ToHashSet();
+        var existingUserNames = existingUsers.Select(u => u.Username).ToHashSet();
 
-         var groupedUser = users
+        //處理輸入用戶列表中的重複用戶名 (只保留第一個)
+        var uniqueUsers = userList
             .GroupBy(u => u.Username)
-            .ToList();
-
-        var duplicateUsers = groupedUser
-            .Where(g => existingUsernames.Contains(g.Key))
-            .Select(g => $"{g.Key} ({g.First().Email}) [existing]")
-            .ToList();
-        
-        var newUsers = groupedUser
-            .Where(g => !existingUsernames.Contains(g.Key))
             .Select(g => g.First())
             .ToList();
 
-        await _repo.AddUsers(newUsers);
+        //分離新用戶和重複用戶
+        var newUsers = uniqueUsers
+            .Where(u => !existingUserNames.Contains(u.Username))
+            .ToList();
 
-        if (duplicateUsers.Any())
+        var duplicateUsernames = uniqueUsers
+            .Where(u => existingUserNames.Contains(u.Username))
+            .Select(u => u.Username)
+            .ToList();
+
+        // 批量新增新用戶
+        if (newUsers.Any())
         {
-            mes["Warning"] = $"Found {duplicateUsers.Count} duplicate users: {string.Join(", ", duplicateUsers)}";
+            await _repo.AddUsers(newUsers);
         }
 
-        mes["Message"] = $"{newUsers.Count()} users imported successfully.";
-
-        return mes;
+        // 返回重複的用戶名稱
+        return duplicateUsernames.Any()
+            ? string.Join(", ", duplicateUsernames)
+            : string.Empty;
     }
-    public async Task<Dictionary<string,string>> UpdateUser(User user)
+    public async Task<string> UpdateUser(User user)
     {
-        var mes = new Dictionary<string, string>();
-        try
+        // 檢查用戶是否存在
+        var existingUser = await GetUser(user.Id);
+        if (existingUser == null)
         {
-            var existingUser = await GetUser(user.Id);
+            return "User not found";
+        }
 
-            var otherUsers = await GetAllUsers();
-            if (otherUsers.Any(u => u.Id != user.Id && u.Username.Equals(user.Username)))
+        //檢查用戶名是否已被其他用戶使用
+        var userWithSameUserName = await GetUserByUsername(user.Username);
+        if (userWithSameUserName != null && userWithSameUserName.Id != user.Id)
+        {
+            return "UserName already exists";
+        }
+
+        //更新用戶資訊
+        existingUser.Username = user.Username;
+        existingUser.Email = user.Email;
+
+        var updatedUser = await _repo.Update(existingUser);
+        return $"{updatedUser.Username} edited successfuly.";
+    }
+
+    public async Task<string> DeleteUser(int id)
+    {
+        var user = await _repo.Get(id);
+        // 執行刪除操作
+        var deletedUsername = await _repo.Delete(user);
+        return $"{deletedUsername} deleted successfuly";
+    }
+
+    public async Task<string> DeleteUsers(IEnumerable<User> users)
+    {
+        var userList = users?.ToList();
+        if (userList == null || !userList.Any())
+        {
+            return "No users provided for deletion";
+        }
+
+        // 檢查所有用戶是否存在
+        var existingUsers = new List<User>();
+        var notFoundUsers = new List<string>();
+
+        foreach (var user in userList)
+        {
+            var existingUser = await _repo.Get(user.Id);
+            if (existingUser != null)
             {
-                mes["isSuccess"] = "false";
-                mes["Message"] = "Username already exists";
-                return mes;
+                existingUsers.Add(existingUser);
             }
-
-            existingUser.Username = user.Username;
-            existingUser.Email = user.Email;
-
-            var name = await _repo.Update(existingUser);
-            mes["isSuccess"] = "true";
-            mes["Message"] = $"{name} edited successfully.";
+            else
+            {
+                notFoundUsers.Add($"ID: {user.Id}");
+            }
         }
-        catch (Exception ex)
+
+        // 執行批量刪除
+        if (existingUsers.Any())
         {
-            mes["isSuccess"] = "false";
-            mes["Message"] = $"Error updating user: {ex.Message}";
+            await _repo.Delete(existingUsers);
         }
 
-        return mes;
-    }
+        // 建立結果訊息
+        var result = new List<string>();
+        
+        if (existingUsers.Any())
+        {
+            result.Add($"{existingUsers.Count} users deleted successfully");
+        }
 
-    public async Task<String> DeleteUser(int id)
-    {
-        return await _repo.Delete(id);
-    }
+        if (notFoundUsers.Any())
+        {
+            result.Add($"Users not found: {string.Join(", ", notFoundUsers)}");
+        }
 
-    public async Task DeleteUsers(IEnumerable<User> users)
-    {
-        await _repo.Delete(users);
+        return string.Join(". ", result);
     }
     
 }
