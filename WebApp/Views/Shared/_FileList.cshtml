@@ -41,7 +41,9 @@
                 {
                     <tr class="text-center">
                         <td><input type="checkbox" name="selectedFiles" value="@file.FileName" /></td>
-                        <td>@file.FileName</td>
+                        <td>
+                            <a href = "@file.FilePath.Substring(7)">@file.FileName</a>
+                        </td>
                         <td>@FormatFileSize(file.FileSize)</td>
                         <td class="align-middle"><a href="/File/DownloadFile?fileName=@file.FileName&userId=@Model.Id&page=@currentPage"><i class="bi bi-download"></i></a></td>
                         <td class="align-middle">
