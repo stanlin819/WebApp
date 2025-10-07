@@ -76,7 +76,7 @@ public class TodoService : ITodoService
     public async Task<Todo> Toggle(int todoId)
     {
         var todo = await _repo.Get(todoId);
-        if (todo == null)
+        if (todo == null) //檢查todo ID 是否存在
             return null;
         todo.done = !todo.done;
         await _repo.Update(todo);
